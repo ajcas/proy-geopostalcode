@@ -7,6 +7,6 @@ services:
   db:
     build: ./db/
     environment:
-      MARIADB_ROOT_PASSWORD: pwd
+      MYSQL_ROOT_PASSWORD: pwd
     ports:
       - 3306:3306 

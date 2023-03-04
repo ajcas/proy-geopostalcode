@@ -1,4 +1,4 @@
-CREATE OR REPLACE DATABASE local_db;
+CREATE DATABASE IF NOT EXISTS local_db;
 
 USE local_db;
 

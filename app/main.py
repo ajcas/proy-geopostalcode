@@ -31,16 +31,6 @@ time_exec = pd.to_datetime('today')
 def raiz():
     return RedirectResponse(url="/docs/")
 
-@app.get("/validar/{numero}")
-def validar_capicua(numero:str):
-    respuesta = "No es capicúa"
-    if numero==numero[::-1]:
-        respuesta = "Es capicúa"
-    return {
-        "numero":numero,
-        "validacion":respuesta
-    }
-
 def guardar_archivo_inicial(df):
     df.rename(columns = {'lon':'longitude','lat':'latitude'}, inplace=True)
     df = df.loc[:,('longitude','latitude')]
@@ -59,10 +49,7 @@ def consultar_codigopostal(df):
     df_l2 = []
     p_json = []
     returned_data = []
-    returned_data_tmp = []
     
-    
-    ctr_carguebd = 10000
 
 
     n_rec = 100
@@ -71,7 +58,7 @@ def consultar_codigopostal(df):
         p_json = json.loads(df_l2.to_json(orient="index"))
         response = requests.post(url, json = p_json)
         response_json = response.json()
-        
+        returned_data_tmp = []
         
         print(i,i+100)
         
@@ -83,15 +70,9 @@ def consultar_codigopostal(df):
         
         returned_data = returned_data_tmp
 
-        if len(returned_data_tmp) == ctr_carguebd:
-            df_wps_tmp = pd.DataFrame(returned_data_tmp, columns=['longitude','latitude','postalcode'])   
-            guardar_geo_codigopostal(df_wps_tmp) 
-            returned_data_tmp = []
-
-    if len(returned_data_tmp) > 0 :
-        df_wps_tmp = pd.DataFrame(returned_data_tmp, columns=['longitude','latitude','postalcode'])   
-        guardar_geo_codigopostal(df_wps_tmp)     
+        df_wps_tmp = pd.DataFrame(returned_data_tmp, columns=['longitude','latitude','postalcode'])
         
+        guardar_geo_codigopostal(df_wps_tmp)
         
     df_wps = pd.DataFrame(returned_data, columns=['longitude','latitude','postalcode'])
     df_notf = pd.Series([df_wps.loc[df_wps['postalcode']=='NOT FOUND'].to_dict(orient="records")], index=["result"])
